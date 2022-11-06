@@ -22,8 +22,9 @@ def gen():
         encode_return_code, image_buffer = cv2.imencode('.jpg', frame)
         io_buf = io.BytesIO(image_buffer)
         
-        results = model(frame, size=320)  # reduce size=320 for faster inference
-        print(results)
+        # 모델에 사진 넣기 -> 이 코드만 넣으면 송출이 안됨
+        # results = model(frame, size=320)  # reduce size=320 for faster inference
+        # print(results)
         
         yield (b'--frame\r\n'
                b'Content-Type: image/jpeg\r\n\r\n' + io_buf.read() + b'\r\n')
