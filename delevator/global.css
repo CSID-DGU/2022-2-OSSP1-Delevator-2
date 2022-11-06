@@ -1,0 +1,25 @@
+@import url("https://fonts.googleapis.com/css2?family=Noto+Sans:wght@700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Gmarket+Sans+TTF:wght@300&display=swap");
+body {
+  margin: 0;
+  line-height: normal;
+}
+:root {
+  /* fonts */
+  --font-gmarket-sans-ttf: "Gmarket Sans TTF";
+  --font-noto-sans: "Noto Sans";
+
+  /* font sizes */
+  --font-size-base: 40px;
+
+  /* Colors */
+  --color-white: #fff;
+  --color-gray-100: rgba(0, 0, 0, 0.5);
+  --color-turquoise: #00ce94;
+
+  /* Paddings */
+  --padding-md: 10px;
+
+  /* border radiuses */
+  --br-md: 40px;
+}
