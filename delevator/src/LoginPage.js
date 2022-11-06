@@ -20,11 +20,9 @@ const LoginPage = () => {
         <b className="delevator-b">Delevator</b>
       </div>
       <input className="input" type="text" placeholder="Enter User ID" />
-      <div className="div2">
-        <img className="line-icon" alt="" src="../line-2.svg" />
-        <div className="or-div">OR</div>
-        <img className="line-icon1" alt="" src="../line-1.svg" />
-      </div>
+      <div className="line2"></div>
+      <div className="or-div">OR</div>
+      <div className="line1"></div>
     </div>
   );
 };
