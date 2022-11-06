@@ -51,8 +51,7 @@ if __name__ == "__main__":
             # print("Loading image.... : {:.2f}s".format(toc - tic))
 
             tic = time.time()
-            response = requests.post(DETECTION_URL, files={
-                                     "image": image_data}).json()
+            response = requests.post(DETECTION_URL, files={"image": image_data}).json()
             toc = time.time()
             print("Requesting results.... : {:.2f}s".format(toc - tic))
 
