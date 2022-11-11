@@ -72,7 +72,7 @@
 .site-name-div2 {
   position: absolute;
   top: 0;
-  left: 0;
+  left: 30px;
   display: flex;
   flex-direction: row;
   padding: var(--padding-md) var(--padding-lg);

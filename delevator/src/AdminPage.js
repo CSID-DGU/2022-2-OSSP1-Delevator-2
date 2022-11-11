@@ -21,7 +21,7 @@ const AdminPage = () => {
       <div className="un5-div">
         <div className="username1-div">UserName5</div>
       </div>
-      <img className="frame-icon" alt="" src="../frame.svg" />
+      <img className="frame-icon" alt="" src="./frame.svg" />
       <div className="up1-div" />
       <div className="up2-div">
         <div className="div">정상</div>
@@ -36,7 +36,7 @@ const AdminPage = () => {
         <div className="div">정상</div>
       </div>
       <div className="up2-div4">
-        <div className="div">의심</div>
+        <div className="div2">의심</div>
       </div>
     </div>
   );

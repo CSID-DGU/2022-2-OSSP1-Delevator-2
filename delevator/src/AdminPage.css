@@ -1,23 +1,49 @@
 .admin-b {
   position: relative;
   display: inline-block;
+  width: 328px;
+  height: 95px;
+
+  font-family: "Noto Sans";
+  font-style: normal;
+  font-weight: 700;
+  font-size: 35px;
+  line-height: 95px;
+
+  color: rgba(0, 0, 0, 0.3);
+
+  /* Inside auto layout */
+
+  flex: none;
+  order: 0;
+  flex-grow: 0;
 }
 .site-name-div {
   position: absolute;
   top: 0;
-  left: 0;
-  height: 115px;
+  left: 30px;
   display: flex;
   flex-direction: row;
   padding: var(--padding-md) var(--padding-lg);
   box-sizing: border-box;
   align-items: center;
   justify-content: center;
+  text-align: left;
+  font-size: var(--font-size-xl);
+  color: var(--color-black);
 }
 .username1-div {
   position: relative;
   font-weight: 500;
   display: inline-block;
+  font-family: "Noto Sans";
+  font-style: normal;
+  font-weight: 500;
+  font-size: 40px;
+  line-height: 54px;
+  left: 10px;
+
+  color: #000000;
 }
 .un1-div,
 .un2-div,
@@ -58,8 +84,8 @@
 .frame-icon,
 .up1-div {
   position: absolute;
-  top: 121px;
-  left: 0;
+  top: 100px;
+  left: 20px;
   width: 1440.01px;
   height: 903px;
 }
@@ -68,13 +94,26 @@
   width: 360px;
   height: 126px;
 }
-.div {
+.div,
+.div2 {
   position: relative;
   font-weight: 600;
   display: inline-block;
   width: 131px;
   height: 91px;
+  left: 15px;
   flex-shrink: 0;
+  font-family: "Inter";
+  font-style: normal;
+  font-weight: 600;
+  font-size: 70px;
+  line-height: 85px;
+}
+.div {
+  color: #009900;
+}
+.div2 {
+  color: #ff0000;
 }
 .up2-div,
 .up2-div1,

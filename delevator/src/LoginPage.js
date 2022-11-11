@@ -2,13 +2,6 @@ import "./LoginPage.css";
 import { Link } from "react-router-dom";
 import React from "react";
 
-const toAdmin = () => {
-  document.location.href("/admin");
-};
-const toUser = () => {
-  document.location.href("/user");
-};
-
 const LoginPage = () => {
   return (
     <div className="login-page-div">
