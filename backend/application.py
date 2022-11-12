@@ -25,8 +25,7 @@ def gen():
         read_return_code, frame = vc.read()
         encode_return_code, image_buffer = cv2.imencode('.jpg', frame)
         io_buf = io.BytesIO(image_buffer)
-        
-        # 모델에 사진 넣기 -> 이 코드만 넣으면 송출이 안됨
+
         results = model(frame, size=320)  # reduce size=320 for faster inference
         #print(results)
         result = results.pandas().xyxy[0]['name']
@@ -67,7 +66,7 @@ def detect_cheating(result):
     Returns: 부정행위에 포함되는 객체 list
 
     """
-    cheating_obj_list = ['cell phone', 'person']
+    cheating_obj_list = ['cell phone', 'person', 'book']
     cheating_list = []
     for i, obj in enumerate(result):
         if obj in cheating_obj_list:
@@ -99,7 +98,7 @@ def gen_warning_msg(cheating_list):
             # 교안이 감지됐을 경우
             warning_msg += '교안이 감지되었습니다. '
 
-    print(warning_msg)
+    #print(warning_msg)
     return warning_msg
 
 
