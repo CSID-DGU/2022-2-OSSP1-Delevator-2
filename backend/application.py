@@ -1,15 +1,16 @@
 #!/usr/bin/env python
-from flask import Flask, render_template, Response, flash
+from flask import Flask, render_template, Response, flash, request
 import io
 import cv2
 import torch
 from PIL import Image
+import time
 
 app = Flask(__name__)
 vc = cv2.VideoCapture(0)
 model = torch.hub.load("ultralytics/yolov5", "yolov5s", force_reload=True)  # force_reload to recache
-model.load_state_dict(torch.load('yolov5s.pt'), strict=False)
-model.eval()
+#model.load_state_dict(torch.load('yolov5s.pt'), strict=False)
+#model.eval()
 
 
 @app.route('/')
@@ -18,36 +19,54 @@ def index():
     return render_template('index.html')
 
 
-
+#@app.route('/get_webcam')
+#@app.route ('/detect_cheating', methods=['POST'])
 def gen():
     """Video streaming generator function."""
+    #if request.method == 'POST':
+    t0 = time.time()
     while True:
-        read_return_code, frame = vc.read()
-        encode_return_code, image_buffer = cv2.imencode('.jpg', frame)
-        io_buf = io.BytesIO(image_buffer)
+        success, frame = vc.read()
 
-        results = model(frame, size=320)  # reduce size=320 for faster inference
-        #print(results)
-        result = results.pandas().xyxy[0]['name']
-        #print(type(result))
-        print(result)
+        if time.time() - t0 > 0.8:
+            encode_return_code, image_buffer = cv2.imencode('.jpg', frame)
+            io_buf = io.BytesIO(image_buffer)
 
-        # 부정행위 감지
-        cheating_list = detect_cheating(result)
-        print(cheating_list)
-        # 부정행위 경고 메세지 출력
-        warning_msg = gen_warning_msg(cheating_list)
-        '''
-        if warning_msg != "":
-            flash(warning_msg)
-            return render_template('index.html')
-        '''
-        print(warning_msg)
-        #render_template('index.html', warning_txt = warning_msg)
+            results = model(frame, size=320)  # reduce size=320 for faster inference
+            # print(results)
+            objs = results.pandas().xyxy[0]['name']
+            result = results.pandas().xyxy[0].to_json(orient = 'records')
 
-        yield (b'--frame\r\n'
-               b'Content-Type: image/jpeg\r\n\r\n' + io_buf.read() + b'\r\n')
-        #return render_template('index.html')
+            print(objs)
+            print(result)
+            #objs.render()  # 결과 렌더링
+
+            # 부정행위 감지
+            cheating_list = detect_cheating(objs)
+            print(cheating_list)
+            # 부정행위 경고 메세지 출력
+            warning_msg = gen_warning_msg(cheating_list)
+            print(warning_msg)
+
+            if not success:
+                break
+            else:
+                ret, buffer = cv2.imencode('.jpg', results.ims[-1])  # 더 효율적인 방법이 있을까?
+                frame = buffer.tobytes()  # 바이트로 변환
+
+                t1 = time.time()
+
+                print("time : {:.4f}s".format(t1 - t0))  # 시간 측정
+
+                t0 = time.time()  # 새로운 기준 시간 측정
+
+                yield (b'--frame\r\n'b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')  # concat frame one by one and show result
+        else:
+            # 1초 안넘었을 경우 모델에 넣지 않고 프레임만 보냄
+            if success:
+                _, buffer = cv2.imencode('.jpg', frame)  # 더 효율적인 방법이 있을까?
+                frame = buffer.tobytes()  # 바이트로 변환
+                yield (b'--frame\r\n'b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
 
 @app.route('/video_feed')
 def video_feed():
@@ -56,6 +75,7 @@ def video_feed():
         gen(),
         mimetype='multipart/x-mixed-replace; boundary=frame'
     )
+
 
 def detect_cheating(result):
     """
