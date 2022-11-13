@@ -26,7 +26,7 @@ def gen():
     """Video streaming generator function."""
     #if request.method == 'POST':
     t0 = time.time()
-    i = 0
+
     while True:
         success, frame = vc.read()
 
@@ -74,10 +74,9 @@ def gen():
                 _, buffer = cv2.imencode('.jpg', frame)  # 더 효율적인 방법이 있을까?
                 frame = buffer.tobytes()  # 바이트로 변환
                 yield (b'--frame\r\n'b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
-        i+=1
-
     vc.release()
     cv2.destroyAllWindows()
+
 @app.route('/video_feed')
 def video_feed():
     """Video streaming route. Put this in the src attribute of an img tag."""
@@ -117,13 +116,9 @@ def gen_warning_msg(cheating_list):
     Returns: 경고 메세지
 
     """
-    person_cnt = 0 # 사람 수
-    warning_msg = '' # 경고 메세지 리스트
+    warning_msg = ''
     for obj in cheating_list:
         if obj == 'person':
-            # 사람 수 2명 이상이면 부정행위로 인식
-            person_cnt += 1
-        if person_cnt >= 2:
             warning_msg += '두명 이상이 감지되었습니다. '
         elif obj == 'cell phone':
             # 핸드폰이 감지됐을 경우
@@ -132,7 +127,6 @@ def gen_warning_msg(cheating_list):
             # 교안이 감지됐을 경우
             warning_msg += '교안이 감지되었습니다. '
 
-    #print(warning_msg)
     return warning_msg
 
 
