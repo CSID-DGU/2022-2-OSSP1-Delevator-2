@@ -5,6 +5,7 @@ import cv2
 import torch
 from PIL import Image
 import time
+from datetime import datetime
 
 app = Flask(__name__)
 vc = cv2.VideoCapture(0)
@@ -38,7 +39,7 @@ def gen():
             else:
                 results = model(frame, size=320)  # reduce size=320 for faster inference
                 # print(results)
-                objs = results.pandas().xyxy[0]['name']
+                #objs = results.pandas().xyxy[0]['name']
                 json_result = results.pandas().xyxy[0].to_json(orient='records')
                 result = results.pandas().xyxy[0]
 
@@ -64,7 +65,8 @@ def gen():
 
                 if len(cheating_list) > 0:
                     # 부정행위가 감지되면
-                    cv2.imwrite('cheating_img.png',frame) # 이미지 파일 저장
+                    now = datetime.now()
+                    cv2.imwrite("{}.jpg".format(now.strftime('%Y%m%d_%H%M%S')), results.ims[-1])  # 부정행위 순간 캡처 이미지 파일 저장
                 yield (b'--frame\r\n'b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')  # concat frame one by one and show result
         else:
             # 1초 안넘었을 경우 모델에 넣지 않고 프레임만 보냄
