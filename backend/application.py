@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 import os
 from flask import Flask, render_template, Response, flash, request
+from pathlib import Path
 import io
 import cv2
 import torch
@@ -66,13 +67,14 @@ def gen():
 
                 print("time : {:.4f}s".format(t1 - t0))  # 시간 측정
 
-                t0 = time.time()  # 새로운 기준 시간 측정x
+                t0 = time.time()  # 새로운 기준 시간 측정
 
                 if len(cheating_list) > 0:
                     # 부정행위가 감지되면
                     now = datetime.now()
                     # 부정행위 순간 캡처 이미지 파일 저장
-                    folderPath = '/Users/jaewonlee/Desktop/Delevator/backend/captureHistory/'
+                    folderPath = Path('backend/captureHistory/').absolute().as_uri()[7:]+'/'
+                    print(folderPath)
                     imgPath = os.path.join(folderPath, now.strftime("%Y%m%d_%H%M%S") + '.jpg')
                     cv2.imwrite(imgPath, results.ims[-1])
                 # concat frame one by one and show result
