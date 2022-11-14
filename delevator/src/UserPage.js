@@ -8,7 +8,7 @@ const UserPage = () => {
       </div>
       <img className="image-2-icon" alt="" src="./image2.png" />
       <div className="frame-div">
-        <b className="b">항목별 부정행위 의심 정도(%)</b>
+        <b className="b">항목별 부정행위 여부</b>
       </div>
       <div className="group-div">
         <div className="frame-div1">
@@ -24,12 +24,11 @@ const UserPage = () => {
           <b className="b4">제3자</b>
         </div>
       </div>
-      <div className="div5">의심</div>
       <div className="rectangle-div" />
-      <div className="button-div">93.4</div>
-      <div className="button-div1">13.7</div>
-      <div className="button-div2">22.1</div>
-      <div className="div6">32.5</div>
+      <div className="button-div">의심</div>
+      <div className="button-div1">정상</div>
+      <div className="button-div2">정상</div>
+      <div className="div6">정상</div>
     </div>
   );
 };

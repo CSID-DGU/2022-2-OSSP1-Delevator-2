@@ -192,7 +192,7 @@
 .button-div {
   position: absolute;
   top: 809px;
-  left: 780px;
+  left: 787px;
   font-weight: 600;
   color: var(--color-red);
   font-family: "Inter";
@@ -229,11 +229,11 @@
 }
 .button-div2 {
   left: 1195px;
-  color: #00c600;
+  color: #009900;
 }
 .div6 {
   left: 589px;
-  color: rgba(0, 255, 133, 0.7);
+  color: #009900;
 }
 .user-page-div {
   position: relative;
