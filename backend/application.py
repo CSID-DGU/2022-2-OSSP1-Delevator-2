@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+import os
 from flask import Flask, render_template, Response, flash, request
 import io
 import cv2
@@ -65,14 +66,15 @@ def gen():
 
                 print("time : {:.4f}s".format(t1 - t0))  # 시간 측정
 
-                t0 = time.time()  # 새로운 기준 시간 측정
+                t0 = time.time()  # 새로운 기준 시간 측정x
 
                 if len(cheating_list) > 0:
                     # 부정행위가 감지되면
                     now = datetime.now()
                     # 부정행위 순간 캡처 이미지 파일 저장
-                    cv2.imwrite("{}.jpg".format(now.strftime(
-                        '%Y%m%d_%H%M%S')), results.ims[-1])
+                    folderPath = '/Users/jaewonlee/Desktop/Delevator/backend/captureHistory/'
+                    imgPath = os.path.join(folderPath, now.strftime("%Y%m%d_%H%M%S") + '.jpg')
+                    cv2.imwrite(imgPath, results.ims[-1])
                 # concat frame one by one and show result
                 yield (b'--frame\r\n'b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
         else:
