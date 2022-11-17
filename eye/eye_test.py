@@ -1,5 +1,5 @@
 # pip install -r requirements.txt
-# python eye.py
+# python eye_test.py 하면 실행됨
 
 import cv2
 from gaze_tracking import GazeTracking
