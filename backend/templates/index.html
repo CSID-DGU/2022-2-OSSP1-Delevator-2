@@ -1,14 +1,17 @@
 <html>
   <head>
     <title>Video Streaming Demonstration</title>
+    <!-- JQuery fetching -->
+    <script src="http://code.jquery.com/jquery-1.11.2.min.js"></script>
+    <script src="http://code.jquery.com/jquery-migrate-1.2.1.min.js"></script>
   </head>
   <body>
     <h1>Video Streaming Demonstration</h1>
     <img src="{{ url_for('video_feed') }}" />
     {% for cheatingDic in cheating_history %}
     <p>
-      {{ cheatingDic['time'] }}: {% for cheating in cheatingDic['cheating_list']
-      %}{{ cheating }} {%endfor%}
+      {{ cheatingDic['time'] }} : {% for cheating in
+      cheatingDic['cheating_list']%} {{ cheating }} {%endfor%}
     </p>
     {% endfor %}
   </body>
