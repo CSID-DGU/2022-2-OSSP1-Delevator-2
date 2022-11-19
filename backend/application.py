@@ -20,7 +20,7 @@ model = torch.hub.load("ultralytics/yolov5", "yolov5s",
 @app.route('/')
 def index():
     """Video streaming home page."""
-    return render_template('index.html')
+    return render_template('index.html', cheating_history=cheating_history)
 
 # 감지된 부정행위 리스트 저장
 # Dictionary의 List 형태. Dictionary의 key는 'time', 'cheating_list', 'imgName'로 구성
