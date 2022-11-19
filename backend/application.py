@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 import os
-from flask import Flask, render_template, Response, flash, request
+from flask import Flask, render_template, Response, flash, request, jsonify
 from pathlib import Path
 import io
 import cv2
@@ -20,8 +20,11 @@ model = torch.hub.load("ultralytics/yolov5", "yolov5s",
 @app.route('/')
 def index():
     """Video streaming home page."""
-    return render_template('index.html')
+    return render_template('index.html', encoding='utf-8')
 
+# 감지된 부정행위 리스트 저장
+# Dictionary의 List 형태. Dictionary의 key는 'time', 'cheating_list', 'imgName'로 구성
+cheating_history = []
 
 # @app.route('/get_webcam')
 # @app.route ('/detect_cheating', methods=['POST'])
@@ -74,9 +77,15 @@ def gen():
                     now = datetime.now()
                     # 부정행위 순간 캡처 이미지 파일 저장
                     folderPath = Path('backend/captureHistory/').absolute().as_uri()[7:]+'/'
-                    print(folderPath)
-                    imgPath = os.path.join(folderPath, now.strftime("%Y%m%d_%H%M%S") + '.jpg')
+                    nowtime = now.strftime("%Y%m%d_%H%M%S")
+                    imgPath = os.path.join(folderPath, nowtime + '.jpg')
+                    print(imgPath)
                     cv2.imwrite(imgPath, results.ims[-1])
+                    
+                    # 부정행위 리스트에 추가 (Dictionary 형태로 저장)
+                    cheating_history.append({'time': nowtime, 'cheating_list': cheating_list, 'imgName': (nowtime + '.jpg')})
+                    print(cheating_history)
+                    
                 # concat frame one by one and show result
                 yield (b'--frame\r\n'b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
         else:
@@ -98,7 +107,12 @@ def video_feed():
         gen(),
         mimetype='multipart/x-mixed-replace; boundary=frame'
     )
-
+    
+@app.route('/cheating_history', methods=['GET'])
+def get_cheating_history():
+    # cheating_history 리스트를 json 형태로 반환
+    data = jsonify({"cheating_history":cheating_history})
+    return data
 
 def detect_cheating(result):
     """
