@@ -11,7 +11,13 @@ function App() {
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<Login />} />
-        <Route path="/user" element={<User />} />
+        <Route
+          path="/user"
+          Component={() => {
+            window.location.href = "https://localhost:8080";
+            return null;
+          }}
+        />
         <Route path="/admin" element={<Admin />} />
       </Routes>
     </BrowserRouter>
