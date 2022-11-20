@@ -1,5 +1,7 @@
 #!/usr/bin/env python
-from flask import Flask, render_template, Response, flash, request
+import os
+from flask import Flask, render_template, Response, flash, request, jsonify
+from pathlib import Path
 import io
 import cv2
 import torch
@@ -8,25 +10,29 @@ import time
 from datetime import datetime
 
 app = Flask(__name__)
-vc = cv2.VideoCapture(0)
-model = torch.hub.load("ultralytics/yolov5", "yolov5s", force_reload=True)  # force_reload to recache
+vc = cv2.VideoCapture(0, cv2.CAP_AVFOUNDATION)
+model = torch.hub.load("ultralytics/yolov5", "yolov5s",
+                       force_reload=True)  # force_reload to recache
 #model.load_state_dict(torch.load('yolov5s.pt'), strict=False)
-#model.eval()
+# model.eval()
 
 
 @app.route('/')
 def index():
     """Video streaming home page."""
-    return render_template('index.html')
+    return render_template('index.html', encoding='utf-8')
 
+# 감지된 부정행위 리스트 저장
+# Dictionary의 List 형태. Dictionary의 key는 'time', 'cheating_list', 'imgName'로 구성
+cheating_history = []
 
-#@app.route('/get_webcam')
-#@app.route ('/detect_cheating', methods=['POST'])
+# @app.route('/get_webcam')
+# @app.route ('/detect_cheating', methods=['POST'])
 def gen():
     """Video streaming generator function."""
-    #if request.method == 'POST':
+    # if request.method == 'POST':
     t0 = time.time()
-
+    i = 0
     while True:
         success, frame = vc.read()
 
@@ -37,14 +43,16 @@ def gen():
             if not success:
                 break
             else:
-                results = model(frame, size=320)  # reduce size=320 for faster inference
+                # reduce size=320 for faster inference
+                results = model(frame, size=320)
                 # print(results)
                 #objs = results.pandas().xyxy[0]['name']
-                json_result = results.pandas().xyxy[0].to_json(orient='records')
+                json_result = results.pandas(
+                ).xyxy[0].to_json(orient='records')
                 result = results.pandas().xyxy[0]
 
                 print(result['name'])
-                #print(result)
+                # print(result)
                 # objs.render()  # 결과 렌더링
 
                 # 부정행위 감지
@@ -54,7 +62,8 @@ def gen():
                 warning_msg = gen_warning_msg(cheating_list)
                 print(warning_msg)
 
-                ret, buffer = cv2.imencode('.jpg', results.ims[-1])  # 더 효율적인 방법이 있을까?
+                ret, buffer = cv2.imencode(
+                    '.jpg', results.ims[-1])  # 더 효율적인 방법이 있을까?
                 frame = buffer.tobytes()  # 바이트로 변환
 
                 t1 = time.time()
@@ -66,16 +75,30 @@ def gen():
                 if len(cheating_list) > 0:
                     # 부정행위가 감지되면
                     now = datetime.now()
-                    cv2.imwrite("{}.jpg".format(now.strftime('%Y%m%d_%H%M%S')), results.ims[-1])  # 부정행위 순간 캡처 이미지 파일 저장
-                yield (b'--frame\r\n'b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')  # concat frame one by one and show result
+                    # 부정행위 순간 캡처 이미지 파일 저장
+                    folderPath = Path('backend/captureHistory/').absolute().as_uri()[7:]+'/'
+                    nowtime = now.strftime("%Y%m%d_%H%M%S")
+                    imgPath = os.path.join(folderPath, nowtime + '.jpg')
+                    print(imgPath)
+                    cv2.imwrite(imgPath, results.ims[-1])
+                    
+                    # 부정행위 리스트에 추가 (Dictionary 형태로 저장)
+                    cheating_history.append({'time': nowtime, 'cheating_list': cheating_list, 'imgName': (nowtime + '.jpg')})
+                    print(cheating_history)
+                    
+                # concat frame one by one and show result
+                yield (b'--frame\r\n'b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
         else:
             # 1초 안넘었을 경우 모델에 넣지 않고 프레임만 보냄
             if success:
                 _, buffer = cv2.imencode('.jpg', frame)  # 더 효율적인 방법이 있을까?
                 frame = buffer.tobytes()  # 바이트로 변환
                 yield (b'--frame\r\n'b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
+        i += 1
+
     vc.release()
     cv2.destroyAllWindows()
+
 
 @app.route('/video_feed')
 def video_feed():
@@ -84,7 +107,12 @@ def video_feed():
         gen(),
         mimetype='multipart/x-mixed-replace; boundary=frame'
     )
-
+    
+@app.route('/cheating_history', methods=['GET'])
+def get_cheating_history():
+    # cheating_history 리스트를 json 형태로 반환
+    data = jsonify({"cheating_history":cheating_history})
+    return data
 
 def detect_cheating(result):
     """
@@ -107,6 +135,7 @@ def detect_cheating(result):
 
     return cheating_list
 
+
 def gen_warning_msg(cheating_list):
     """
     부정행위 객체가 감지되면 부정행위 객체별로 경고 메세지 생성하는 함수
@@ -116,9 +145,13 @@ def gen_warning_msg(cheating_list):
     Returns: 경고 메세지
 
     """
-    warning_msg = ''
+    person_cnt = 0  # 사람 수
+    warning_msg = ''  # 경고 메세지 리스트
     for obj in cheating_list:
         if obj == 'person':
+            # 사람 수 2명 이상이면 부정행위로 인식
+            person_cnt += 1
+        if person_cnt >= 2:
             warning_msg += '두명 이상이 감지되었습니다. '
         elif obj == 'cell phone':
             # 핸드폰이 감지됐을 경우
@@ -127,9 +160,9 @@ def gen_warning_msg(cheating_list):
             # 교안이 감지됐을 경우
             warning_msg += '교안이 감지되었습니다. '
 
+    # print(warning_msg)
     return warning_msg
 
 
-
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', debug=True, threaded=True)
+    app.run(host='0.0.0.0', debug=True, threaded=True, port=8080)
