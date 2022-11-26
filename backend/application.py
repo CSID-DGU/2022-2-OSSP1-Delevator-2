@@ -22,6 +22,10 @@ def index():
     """Video streaming home page."""
     return render_template('index.html', encoding='utf-8')
 
+@app.route('/history')
+def loadImage():
+    return render_template('image.html', encoding='utf-8')
+
 # 감지된 부정행위 리스트 저장
 # Dictionary의 List 형태. Dictionary의 key는 'time', 'cheating_list', 'imgName'로 구성
 cheating_history = []

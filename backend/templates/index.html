@@ -32,7 +32,10 @@
                 $.each(cheatings, function (index, value) {
                   output += value;
                 });
-                output += " / ImageFileName : " + imgName;
+                output +=
+                  ' / ImageFileName : <a href="http://127.0.0.1:8080/history">' +
+                  imgName +
+                  "</a>";
 
                 cheatingHistoryDiv.append(output + "<br>");
               });
