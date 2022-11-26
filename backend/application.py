@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 import os
-from flask import Flask, render_template, Response, flash, request, jsonify
+from flask import Flask, render_template, Response, flash, request, jsonify, send_from_directory
 from pathlib import Path
 import io
 import cv2
@@ -9,7 +9,7 @@ from PIL import Image
 import time
 from datetime import datetime
 
-app = Flask(__name__)
+app = Flask(__name__, static_folder='static')
 vc = cv2.VideoCapture(0, cv2.CAP_AVFOUNDATION)
 model = torch.hub.load("ultralytics/yolov5", "yolov5s",
                        force_reload=True)  # force_reload to recache
@@ -22,9 +22,9 @@ def index():
     """Video streaming home page."""
     return render_template('index.html', encoding='utf-8')
 
-@app.route('/history')
-def loadImage():
-    return render_template('image.html', encoding='utf-8')
+@app.route('/history/<filename>')
+def loadImage(filename):
+    return send_from_directory('static/captureHistory', filename);
 
 # 감지된 부정행위 리스트 저장
 # Dictionary의 List 형태. Dictionary의 key는 'time', 'cheating_list', 'imgName'로 구성
