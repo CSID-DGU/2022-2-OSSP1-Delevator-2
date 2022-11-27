@@ -1,0 +1,248 @@
+.user-b {
+  width: 328px;
+  height: 95px;
+
+  font-family: "Noto Sans";
+  font-style: normal;
+  font-weight: 700;
+  font-size: 35px;
+  line-height: 95px;
+
+  color: rgba(0, 0, 0, 0.3);
+
+  /* Inside auto layout */
+
+  flex: none;
+  order: 0;
+  flex-grow: 0;
+}
+.site-name-div1 {
+  position: absolute;
+  top: 0;
+  left: 30px;
+  height: 115px;
+  display: flex;
+  flex-direction: row;
+  padding: var(--padding-md) var(--padding-lg);
+  box-sizing: border-box;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--font-size-xl);
+  font-family: var(--font-noto-sans);
+}
+.image-2-icon {
+  position: absolute;
+  top: 135px;
+  left: 40px;
+  width: 800px;
+  height: 544.17px;
+  object-fit: cover;
+}
+.b {
+  position: relative;
+  display: inline-block;
+  width: 442px;
+  height: 44px;
+  flex-shrink: 0;
+  font-family: "Inter";
+  font-style: normal;
+  font-weight: 700;
+  font-size: 35px;
+  line-height: 42px;
+
+  color: #000000;
+}
+.frame-div {
+  position: absolute;
+  top: 814px;
+  left: 30px;
+  display: flex;
+  flex-direction: row;
+  padding: var(--padding-sm);
+  box-sizing: border-box;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--font-size-sm);
+}
+.b1 {
+  position: relative;
+  display: inline-block;
+  width: 68px;
+  height: 44px;
+  flex-shrink: 0;
+  font-family: "Inter";
+  font-style: normal;
+  font-weight: 700;
+  font-size: 35px;
+  line-height: 42px;
+}
+.frame-div1 {
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: flex;
+  flex-direction: row;
+  padding: var(--padding-sm);
+  box-sizing: border-box;
+  align-items: center;
+  justify-content: center;
+}
+.b2 {
+  position: relative;
+  display: inline-block;
+  width: 148px;
+  height: 44px;
+  flex-shrink: 0;
+  font-family: "Inter";
+  font-style: normal;
+  font-weight: 700;
+  font-size: 35px;
+  line-height: 42px;
+}
+.frame-div2 {
+  position: absolute;
+  top: 0;
+  left: 165px;
+  display: flex;
+  flex-direction: row;
+  padding: var(--padding-sm);
+  box-sizing: border-box;
+  align-items: center;
+  justify-content: center;
+}
+.b3 {
+  position: relative;
+  display: inline-block;
+  width: 100px;
+  height: 44px;
+  flex-shrink: 0;
+  font-family: "Inter";
+  font-style: normal;
+  font-weight: 700;
+  font-size: 35px;
+  line-height: 42px;
+}
+.frame-div3 {
+  position: absolute;
+  top: 0;
+  left: 396px;
+  display: flex;
+  flex-direction: row;
+  padding: var(--padding-sm);
+  box-sizing: border-box;
+  align-items: center;
+  justify-content: center;
+}
+.b4 {
+  position: relative;
+  display: inline-block;
+  width: 91px;
+  height: 44px;
+  flex-shrink: 0;
+  font-family: "Inter";
+  font-style: normal;
+  font-weight: 700;
+  font-size: 35px;
+  line-height: 42px;
+}
+.frame-div4 {
+  position: absolute;
+  top: 0;
+  left: 600px;
+  display: flex;
+  flex-direction: row;
+  padding: var(--padding-sm);
+  box-sizing: border-box;
+  align-items: center;
+  justify-content: center;
+}
+.group-div {
+  position: absolute;
+  top: 699px;
+  left: 596px;
+  width: 711px;
+  height: 64px;
+  font-size: var(--font-size-sm);
+}
+.div5 {
+  position: absolute;
+  top: 916px;
+  left: 859px;
+  font-size: var(--font-size-xl);
+  font-weight: 600;
+  color: var(--color-red);
+  display: inline-block;
+  font-family: "Inter";
+  font-style: normal;
+  font-weight: 600;
+  font-size: 70px;
+  line-height: 85px;
+  /* identical to box height */
+
+  color: #ff0000;
+}
+.rectangle-div {
+  position: absolute;
+  top: 57px;
+  left: 870px;
+  background-color: #d9d9d9;
+  width: 510px;
+  height: 623px;
+}
+.button-div {
+  position: absolute;
+  top: 809px;
+  left: 787px;
+  font-weight: 600;
+  color: var(--color-red);
+  font-family: "Inter";
+  font-style: normal;
+  font-weight: 600;
+  font-size: 50px;
+  line-height: 61px;
+  /* identical to box height */
+
+  color: #ff0000;
+  display: inline-block;
+}
+.button-div1 {
+  left: 1003.5px;
+  color: var(--color-green-100);
+}
+.button-div1,
+.button-div2,
+.div6 {
+  position: absolute;
+  top: 809px;
+  font-weight: 600;
+  display: inline-block;
+  font-family: "Inter";
+  font-style: normal;
+  font-weight: 600;
+  font-size: 50px;
+  line-height: 61px;
+  /* identical to box height */
+}
+.button-div1 {
+  left: 995px;
+  color: #009900;
+}
+.button-div2 {
+  left: 1195px;
+  color: #009900;
+}
+.div6 {
+  left: 589px;
+  color: #009900;
+}
+.user-page-div {
+  position: relative;
+  background-color: var(--color-white);
+  width: 100%;
+  height: 1024px;
+  overflow: hidden;
+  text-align: left;
+  font-size: var(--font-size-lg);
+  color: var(--color-black);
+  font-family: var(--font-inter);
+}

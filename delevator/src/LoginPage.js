@@ -1,18 +1,19 @@
 import "./LoginPage.css";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import React from "react";
 
 const LoginPage = () => {
+  const navigate = useNavigate();
   return (
     <div className="login-page-div">
-      <Link to="/user">
+      <a target={"_blank"} href="http://localhost:8080/">
         <div className="div7">
           <div className="searchbargroup-div">
             <div className="borderline-div" />
             <b className="b5">사용자 로그인</b>
           </div>
         </div>
-      </Link>
+      </a>
       <Link to="/admin">
         <div className="div8">
           <div className="searchbargroup-div">

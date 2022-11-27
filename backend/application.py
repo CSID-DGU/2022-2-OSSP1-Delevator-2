@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 import os
-from flask import Flask, render_template, Response, flash, request
+from flask import Flask, render_template, Response, flash, request, jsonify, send_from_directory
 from pathlib import Path
 import io
 import cv2
@@ -9,7 +9,7 @@ from PIL import Image
 import time
 from datetime import datetime
 
-app = Flask(__name__)
+app = Flask(__name__, static_folder='static')
 vc = cv2.VideoCapture(0, cv2.CAP_AVFOUNDATION)
 model = torch.hub.load("ultralytics/yolov5", "yolov5s",
                        force_reload=True)  # force_reload to recache
@@ -20,8 +20,15 @@ model = torch.hub.load("ultralytics/yolov5", "yolov5s",
 @app.route('/')
 def index():
     """Video streaming home page."""
-    return render_template('index.html')
+    return render_template('index.html', encoding='utf-8')
 
+@app.route('/history/<filename>')
+def loadImage(filename):
+    return send_from_directory('static/captureHistory', filename);
+
+# 감지된 부정행위 리스트 저장
+# Dictionary의 List 형태. Dictionary의 key는 'time', 'cheating_list', 'imgName'로 구성
+cheating_history = []
 
 # @app.route('/get_webcam')
 # @app.route ('/detect_cheating', methods=['POST'])
@@ -73,10 +80,16 @@ def gen():
                     # 부정행위가 감지되면
                     now = datetime.now()
                     # 부정행위 순간 캡처 이미지 파일 저장
-                    folderPath = Path('backend/captureHistory/').absolute().as_uri()[7:]+'/'
-                    print(folderPath)
-                    imgPath = os.path.join(folderPath, now.strftime("%Y%m%d_%H%M%S") + '.jpg')
+                    folderPath = Path('backend/static/captureHistory').absolute().as_uri()[7:]+'/'
+                    nowtime = now.strftime("%Y%m%d_%H%M%S")
+                    imgPath = os.path.join(folderPath, nowtime + '.jpg')
+                    print(imgPath)
                     cv2.imwrite(imgPath, results.ims[-1])
+                    
+                    # 부정행위 리스트에 추가 (Dictionary 형태로 저장)
+                    cheating_history.append({'time': nowtime, 'cheating_list': cheating_list, 'imgName': (nowtime + '.jpg')})
+                    print(cheating_history)
+                    
                 # concat frame one by one and show result
                 yield (b'--frame\r\n'b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
         else:
@@ -98,7 +111,12 @@ def video_feed():
         gen(),
         mimetype='multipart/x-mixed-replace; boundary=frame'
     )
-
+    
+@app.route('/cheating_history', methods=['GET'])
+def get_cheating_history():
+    # cheating_history 리스트를 json 형태로 반환
+    data = jsonify({"cheating_history":cheating_history})
+    return data
 
 def detect_cheating(result):
     """

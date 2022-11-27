@@ -1,9 +1,59 @@
 <html>
   <head>
     <title>Video Streaming Demonstration</title>
+    <!-- JQuery fetching -->
+    <script src="http://code.jquery.com/jquery-1.11.2.min.js"></script>
+    <script src="http://code.jquery.com/jquery-migrate-1.2.1.min.js"></script>
+    <script type="text/javascript" language="javascript">
+      setInterval(() => {
+        fetchCheatingHistory();
+      }, 1000);
+
+      var fetchCheatingHistory = function () {
+        $.ajax({
+          url: "http://localhost:8080/cheating_history",
+          type: "GET",
+          dataType: "json",
+          success: function (data) {
+            // update the cheating history of div
+
+            $.each(data, function (index, value) {
+              var cheatingHistoryDiv = $("#cheatingHistory");
+              cheatingHistoryDiv.empty();
+              console.log(value);
+              $.each(value, function (index, value) {
+                cheatings = value["cheating_list"];
+                time = value["time"];
+                imgName = value["imgName"];
+
+                var output = "";
+                output += "Time : " + time;
+                output += " / Cheating : ";
+                $.each(cheatings, function (index, value) {
+                  output += value;
+                });
+
+                output +=
+                  ' / ImageFileName : <a href="http://127.0.0.1:8080/history/' +
+                  imgName +
+                  '">' +
+                  imgName +
+                  "</a>";
+
+                cheatingHistoryDiv.append(output + "<br>");
+              });
+            });
+          },
+          error: function () {
+            console.log("error");
+          },
+        });
+      };
+    </script>
   </head>
   <body>
     <h1>Video Streaming Demonstration</h1>
-    <img src="{{ url_for('video_feed') }}">
+    <img src="{{ url_for('video_feed') }}" />
+    <div id="cheatingHistory"><p></p></div>
   </body>
 </html>
