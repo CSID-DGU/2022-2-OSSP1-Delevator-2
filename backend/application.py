@@ -48,7 +48,7 @@ cheating_history = []
 
 # @app.route('/get_webcam')
 # @app.route ('/detect_cheating', methods=['POST'])
-def gen():
+def gen(username):
     """Video streaming generator function."""
     # if request.method == 'POST':
     t0 = time.time()
@@ -115,7 +115,7 @@ def gen():
                     # 부정행위 순간 캡처 이미지 파일 저장
                     folderPath = Path('backend/static/captureHistory').absolute().as_uri()[7:]+'/'
                     nowtime = now.strftime("%Y%m%d_%H%M%S")
-                    imgPath = os.path.join(folderPath, nowtime + '.jpg')
+                    imgPath = os.path.join(folderPath, nowtime + "_" + username + '.jpg')
                     print(imgPath)
                     cv2.imwrite(imgPath, results.ims[-1])
                     
@@ -139,11 +139,11 @@ def gen():
     cv2.destroyAllWindows()
 
 
-@app.route('/video_feed')
-def video_feed():
+@app.route('/video_feed/<username>')
+def video_feed(username):
     """Video streaming route. Put this in the src attribute of an img tag."""
     return Response(
-        gen(),
+        gen(username),
         mimetype='multipart/x-mixed-replace; boundary=frame'
     )
     
