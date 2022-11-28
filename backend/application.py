@@ -13,8 +13,7 @@ from gaze_tracking import GazeTracking
 
 app = Flask(__name__, static_folder='static')
 vc = cv2.VideoCapture(0, cv2.CAP_AVFOUNDATION)
-model = torch.hub.load("ultralytics/yolov5", "yolov5s",
-                       force_reload=True)  # force_reload to recache
+model = torch.hub.load('ultralytics/yolov5', 'custom', path='../teamD2.pt', force_reload=True)
 #model.load_state_dict(torch.load('yolov5s.pt'), strict=False)
 # model.eval()
 
@@ -38,8 +37,11 @@ def gen():
     """Video streaming generator function."""
     # if request.method == 'POST':
     t0 = time.time()
-    i = 0
+    time_cnt = 0
+    right_cnt = 0
+    left_cnt = 0
     gaze = GazeTracking() # object 만들기
+    warning_msg = ''
     
     while True:
         success, frame = vc.read()
@@ -51,38 +53,52 @@ def gen():
         if gaze.is_blinking(): # 눈 감았을 때
             text = "Blinking"
         elif gaze.is_right(): # 오른쪽을 보고 있을 때
+            right_cnt += 1
             text = "Looking right"
         elif gaze.is_left(): # 왼쪽을 보고 있을 때
             text = "Looking left"
         elif gaze.is_center(): # 정면을 보고 있을 때
+            left_cnt += 1
             text = "Looking center"
 
         print(text)
+        print('left_cnt: ', str(left_cnt), 'right_cnt: ', str(right_cnt))
+
+        # 10초마다 시선 부정행위 판별 & 초기화
+        if time_cnt == 10:
+            if left_cnt > 5:
+                # 왼쪽 쳐다 보는 횟수가 10회 이상이면
+                warning_msg = '시선이 왼쪽에 향해있습니다. 부정행위가 의심됩니다. '
+            if right_cnt > 5:
+                # 오른쪽 쳐다 보는 횟수가 10회 이상이면
+                warning_msg += '시선이 오른쪽에 향해있습니다. 부정행위가 의심됩니다. '
+
+            print(time.time(), ' ', warning_msg)
+            #gaze_t0 = time.time() # gaze_t0 초기화
+            left_cnt = 0 # 초기화
+            right_cnt = 0 # 초기화
+            time_cnt = 0 # 초기화
 
         if time.time() - t0 > 0.8:
-            #encode_return_code, image_buffer = cv2.imencode('.jpg', frame)
-            #io_buf = io.BytesIO(image_buffer)
-
             if not success:
                 break
             else:
                 # reduce size=320 for faster inference
                 results = model(frame, size=320)
-                # print(results)
-                #objs = results.pandas().xyxy[0]['name']
                 json_result = results.pandas(
                 ).xyxy[0].to_json(orient='records')
                 result = results.pandas().xyxy[0]
 
                 print(result[['name', 'confidence']])
-                # print(result)
-                # objs.render()  # 결과 렌더링
 
                 # 부정행위 감지
                 cheating_df = detect_cheating(pd.DataFrame(result[['name', 'confidence']]))
-                print(cheating_df)
+
                 # 부정행위 경고 메세지 출력
-                warning_msg = gen_warning_msg(cheating_df['object'])
+                if warning_msg == '':
+                    warning_msg = gen_warning_msg(cheating_df['object'])
+                else:
+                    warning_msg += gen_warning_msg(cheating_df['object'])
                 print(warning_msg)
 
                 ret, buffer = cv2.imencode(
@@ -110,6 +126,7 @@ def gen():
                                              'warning_msg': warning_msg,
                                              'imgName': (nowtime + '.jpg')})
                     print(cheating_history)
+                warning_msg = ''    # warning_msg 초기화
                     
                 # concat frame one by one and show result
                 yield (b'--frame\r\n'b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
@@ -119,7 +136,7 @@ def gen():
                 _, buffer = cv2.imencode('.jpg', frame)  # 더 효율적인 방법이 있을까?
                 frame = buffer.tobytes()  # 바이트로 변환
                 yield (b'--frame\r\n'b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
-        i += 1
+            time_cnt += 1   # 1초 반복 횟수 count
 
     vc.release()
     cv2.destroyAllWindows()
