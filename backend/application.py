@@ -1,4 +1,6 @@
 #!/usr/bin/env python
+from json import dumps
+import json
 import os
 from flask import Flask, render_template, Response, flash, request, jsonify, send_from_directory
 from pathlib import Path
@@ -10,10 +12,11 @@ import time
 from datetime import datetime
 
 app = Flask(__name__, static_folder='static')
+app.config['JSON_AS_ASCII'] = False
 vc = cv2.VideoCapture(0, cv2.CAP_AVFOUNDATION)
 model = torch.hub.load("ultralytics/yolov5", "yolov5s",
                        force_reload=True)  # force_reload to recache
-#model.load_state_dict(torch.load('yolov5s.pt'), strict=False)
+#model.load_state_dict(torch.load('yolov5s.pt'), strict=False)s
 # model.eval()
 
 
@@ -21,6 +24,11 @@ model = torch.hub.load("ultralytics/yolov5", "yolov5s",
 def index():
     """Video streaming home page."""
     return render_template('index.html', encoding='utf-8')
+
+@app.route('/user/<username>')
+def index2(username):
+    data = { "username" : username }
+    return render_template('index.html', encoding='utf-8', username=username)
 
 @app.route('/history/<filename>')
 def loadImage(filename):
@@ -31,8 +39,8 @@ def loadImage(filename):
 cheating_history = []
 
 # @app.route('/get_webcam')
-# @app.route ('/detect_cheating', methods=['POST'])
-def gen():
+# @app.route('/detect_cheating', methods=['POST'])
+def gen(username):
     """Video streaming generator function."""
     # if request.method == 'POST':
     t0 = time.time()
@@ -82,12 +90,12 @@ def gen():
                     # 부정행위 순간 캡처 이미지 파일 저장
                     folderPath = Path('backend/static/captureHistory').absolute().as_uri()[7:]+'/'
                     nowtime = now.strftime("%Y%m%d_%H%M%S")
-                    imgPath = os.path.join(folderPath, nowtime + '.jpg')
+                    imgPath = os.path.join(folderPath, nowtime + "_" + username  + '.jpg')
                     print(imgPath)
                     cv2.imwrite(imgPath, results.ims[-1])
                     
                     # 부정행위 리스트에 추가 (Dictionary 형태로 저장)
-                    cheating_history.append({'time': nowtime, 'cheating_list': cheating_list, 'imgName': (nowtime + '.jpg')})
+                    cheating_history.append({'time': nowtime, 'cheating_list': cheating_list, 'imgName': (nowtime + "_" + username + '.jpg')})
                     print(cheating_history)
                     
                 # concat frame one by one and show result
@@ -104,12 +112,12 @@ def gen():
     cv2.destroyAllWindows()
 
 
-@app.route('/video_feed')
-def video_feed():
+@app.route('/video_feed/<username>')
+def video_feed(username):
     """Video streaming route. Put this in the src attribute of an img tag."""
     return Response(
-        gen(),
-        mimetype='multipart/x-mixed-replace; boundary=frame'
+        gen(username),
+        mimetype='multipart/x-mixed-replace; boundary=frame',
     )
     
 @app.route('/cheating_history', methods=['GET'])
