@@ -2,7 +2,7 @@
 from json import dumps
 import json
 import os
-from flask import Flask, render_template, Response, flash, request, jsonify, send_from_directory
+from flask import Flask, render_template, Response, flash, request, jsonify, send_from_directory, redirect
 from pathlib import Path
 import io
 import cv2
@@ -10,6 +10,7 @@ import torch
 from PIL import Image
 import time
 from datetime import datetime
+from threading import Thread
 
 app = Flask(__name__, static_folder='static')
 app.config['JSON_AS_ASCII'] = False
@@ -21,9 +22,10 @@ model = torch.hub.load("ultralytics/yolov5", "yolov5s",
 
 
 @app.route('/')
-def index():
+def index() -> '302':
     """Video streaming home page."""
-    return render_template('index.html', encoding='utf-8')
+    # return render_template('index.html', encoding='utf-8')
+    return redirect('user/no_name')
 
 @app.route('/user/<username>')
 def index2(username):
