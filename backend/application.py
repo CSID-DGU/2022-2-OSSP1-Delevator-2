@@ -22,7 +22,21 @@ model = torch.hub.load("ultralytics/yolov5", "yolov5s",
 @app.route('/')
 def index():
     """Video streaming home page."""
-    return render_template('index.html', encoding='utf-8')
+
+    # return render_template('index.html', encoding='utf-8')
+    return redirect('user/no_name')
+
+@app.route('/user/')
+def userRedirect() -> '302':
+    """Video streaming home page."""
+    # return render_template('index.html', encoding='utf-8')
+    return redirect('user/no_name')
+
+@app.route('/user/<username>')
+def index2(username):
+    data = { "username" : username }
+    return render_template('index.html', encoding='utf-8', username=username)
+
 
 @app.route('/history/<filename>')
 def loadImage(filename):
