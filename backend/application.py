@@ -113,7 +113,7 @@ def gen(username):
                     # 부정행위가 감지되면
                     now = datetime.now()
                     # 부정행위 순간 캡처 이미지 파일 저장
-                    folderPath = Path('backend/static/captureHistory').absolute().as_uri()[7:]+'/'
+                    folderPath = Path('static/captureHistory').absolute().as_uri()[7:]+'/'
                     nowtime = now.strftime("%Y%m%d_%H%M%S")
                     imgPath = os.path.join(folderPath, nowtime + "_" + username + '.jpg')
                     print(imgPath)
