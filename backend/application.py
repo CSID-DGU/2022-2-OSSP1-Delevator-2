@@ -1,8 +1,6 @@
 #!/usr/bin/env python
-from json import dumps
-import json
 import os
-from flask import Flask, render_template, Response, flash, request, jsonify, send_from_directory, redirect
+from flask import Flask, render_template, Response, flash, request, jsonify, send_from_directory
 from pathlib import Path
 import io
 import cv2
@@ -10,20 +8,21 @@ import torch
 from PIL import Image
 import time
 from datetime import datetime
-from threading import Thread
+import pandas as pd
+from gaze_tracking import GazeTracking
 
 app = Flask(__name__, static_folder='static')
-app.config['JSON_AS_ASCII'] = False
 vc = cv2.VideoCapture(0, cv2.CAP_AVFOUNDATION)
 model = torch.hub.load("ultralytics/yolov5", "yolov5s",
                        force_reload=True)  # force_reload to recache
-#model.load_state_dict(torch.load('yolov5s.pt'), strict=False)s
+#model.load_state_dict(torch.load('yolov5s.pt'), strict=False)
 # model.eval()
 
 
 @app.route('/')
-def index() -> '302':
+def index():
     """Video streaming home page."""
+
     # return render_template('index.html', encoding='utf-8')
     return redirect('user/no_name')
 
@@ -38,6 +37,7 @@ def index2(username):
     data = { "username" : username }
     return render_template('index.html', encoding='utf-8', username=username)
 
+
 @app.route('/history/<filename>')
 def loadImage(filename):
     return send_from_directory('static/captureHistory', filename);
@@ -47,14 +47,31 @@ def loadImage(filename):
 cheating_history = []
 
 # @app.route('/get_webcam')
-# @app.route('/detect_cheating', methods=['POST'])
-def gen(username):
+# @app.route ('/detect_cheating', methods=['POST'])
+def gen():
     """Video streaming generator function."""
     # if request.method == 'POST':
     t0 = time.time()
     i = 0
+    gaze = GazeTracking() # object 만들기
+    
     while True:
         success, frame = vc.read()
+        gaze.refresh(frame)
+
+        frame = gaze.annotated_frame() # 분석된 영상
+        text = ""
+
+        if gaze.is_blinking(): # 눈 감았을 때
+            text = "Blinking"
+        elif gaze.is_right(): # 오른쪽을 보고 있을 때
+            text = "Looking right"
+        elif gaze.is_left(): # 왼쪽을 보고 있을 때
+            text = "Looking left"
+        elif gaze.is_center(): # 정면을 보고 있을 때
+            text = "Looking center"
+
+        print(text)
 
         if time.time() - t0 > 0.8:
             #encode_return_code, image_buffer = cv2.imencode('.jpg', frame)
@@ -71,15 +88,15 @@ def gen(username):
                 ).xyxy[0].to_json(orient='records')
                 result = results.pandas().xyxy[0]
 
-                print(result['name'])
+                print(result[['name', 'confidence']])
                 # print(result)
                 # objs.render()  # 결과 렌더링
 
                 # 부정행위 감지
-                cheating_list = detect_cheating(result['name'])
-                print(cheating_list)
+                cheating_df = detect_cheating(pd.DataFrame(result[['name', 'confidence']]))
+                print(cheating_df)
                 # 부정행위 경고 메세지 출력
-                warning_msg = gen_warning_msg(cheating_list)
+                warning_msg = gen_warning_msg(cheating_df['object'])
                 print(warning_msg)
 
                 ret, buffer = cv2.imencode(
@@ -92,18 +109,20 @@ def gen(username):
 
                 t0 = time.time()  # 새로운 기준 시간 측정
 
-                if len(cheating_list) > 0:
+                if len(cheating_df) > 0:
                     # 부정행위가 감지되면
                     now = datetime.now()
                     # 부정행위 순간 캡처 이미지 파일 저장
                     folderPath = Path('backend/static/captureHistory').absolute().as_uri()[7:]+'/'
                     nowtime = now.strftime("%Y%m%d_%H%M%S")
-                    imgPath = os.path.join(folderPath, nowtime + "_" + username  + '.jpg')
+                    imgPath = os.path.join(folderPath, nowtime + '.jpg')
                     print(imgPath)
                     cv2.imwrite(imgPath, results.ims[-1])
                     
                     # 부정행위 리스트에 추가 (Dictionary 형태로 저장)
-                    cheating_history.append({'username': username, 'time': nowtime, 'cheating_list': cheating_list, 'imgName': (nowtime + "_" + username + '.jpg')})
+                    cheating_history.append({'time': nowtime, 'cheating_list': list(cheating_df['object'].values),
+                                             'warning_msg': warning_msg,
+                                             'imgName': (nowtime + '.jpg')})
                     print(cheating_history)
                     
                 # concat frame one by one and show result
@@ -120,12 +139,12 @@ def gen(username):
     cv2.destroyAllWindows()
 
 
-@app.route('/video_feed/<username>')
-def video_feed(username):
+@app.route('/video_feed')
+def video_feed():
     """Video streaming route. Put this in the src attribute of an img tag."""
     return Response(
-        gen(username),
-        mimetype='multipart/x-mixed-replace; boundary=frame',
+        gen(),
+        mimetype='multipart/x-mixed-replace; boundary=frame'
     )
     
 @app.route('/cheating_history', methods=['GET'])
@@ -138,22 +157,38 @@ def detect_cheating(result):
     """
     객체감지 모델에서 감지한 객체 중 부정행위에 포함되는 객체를 반환해주는 함수
     Args:
-        result: 객체감지 모델 predict 결과
+        result: 객체감지 모델 predict 결과(name, confidence)
 
     Returns: 부정행위에 포함되는 객체 list
 
     """
     cheating_obj_list = ['cell phone', 'book']
     cheating_list = []
+    cheating_conf = []
     person_cnt = 0
-    for i, obj in enumerate(result):
-        if obj == 'person':
-            # 사람 수 2명 이상이면 부정행위로 인식
-            person_cnt += 1
-        if (obj in cheating_obj_list) or (obj == 'person' and person_cnt > 1):
-            cheating_list.append(obj)
+    sum_conf = 0
+    for i, res in enumerate(result.values):
+        if res[0] in cheating_obj_list:
+            if (res[0] == 'person') and (float(res[1]) > 0.6):
+                # confidence 값이 0.6보다 클 때 사람 수 count
+                person_cnt += 1
+                sum_conf += float(res[1])
 
-    return cheating_list
+            if (res[0] != 'person') and (float(res[1]) > 0.6):
+                # 핸드폰, 교안의 경우 confidence 값이 0.6보다 클 때 부정행위로 인식
+                cheating_list.append(res[0])
+                cheating_conf.append(float(res[1]))
+
+            elif (res[0] == 'person') and (person_cnt > 1):
+                # 사람일 경우 2명 이상일 때 부정행위로 인식
+                cheating_list.append(res[0])
+                cheating_conf.append(sum_conf / person_cnt)
+
+    cheating_df = pd.DataFrame({'object': cheating_list, 'confidence': cheating_conf})
+    print('**cheating_df**')
+    print(cheating_df)
+
+    return cheating_df
 
 
 def gen_warning_msg(cheating_list):
