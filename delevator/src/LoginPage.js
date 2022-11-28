@@ -46,12 +46,14 @@ export class LoginPage extends Component {
           <div className="site-name-div2">
             <b className="delevator-b">Delevator</b>
           </div>
-          <input
-            className="input"
-            type="text"
-            placeholder="Enter User ID"
-            onChange={this.inputValueChange}
-          />
+          <div className="inputDiv">
+            <input
+              className="input"
+              type="text"
+              placeholder="Enter User ID"
+              onChange={this.inputValueChange}
+            />
+          </div>
           <div className="div9">
             <div className="or-div">OR</div>
           </div>
