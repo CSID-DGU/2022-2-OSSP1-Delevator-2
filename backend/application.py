@@ -95,7 +95,7 @@ def gen(username):
                     cv2.imwrite(imgPath, results.ims[-1])
                     
                     # 부정행위 리스트에 추가 (Dictionary 형태로 저장)
-                    cheating_history.append({'time': nowtime, 'cheating_list': cheating_list, 'imgName': (nowtime + "_" + username + '.jpg')})
+                    cheating_history.append({'username': username, 'time': nowtime, 'cheating_list': cheating_list, 'imgName': (nowtime + "_" + username + '.jpg')})
                     print(cheating_history)
                     
                 # concat frame one by one and show result

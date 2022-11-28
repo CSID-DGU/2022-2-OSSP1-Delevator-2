@@ -45,53 +45,55 @@
 
               console.log(value);
               $.each(value, function (index, value) {
-                cheatingList = value["cheating_list"];
-                time = value["time"];
-                imgName = value["imgName"];
+                if (value["username"] == username) {
+                  cheatingList = value["cheating_list"];
+                  time = value["time"];
+                  imgName = value["imgName"];
 
-                var cheatings = "";
+                  var cheatings = "";
 
-                var tableRow = $("<tr></tr>");
-                var time_year = time.substring(0, 4);
-                var time_month = time.substring(4, 6);
-                var time_day = time.substring(6, 8);
-                var time_hour = time.substring(9, 11);
-                var time_minute = time.substring(11, 13);
-                var time_second = time.substring(13, 15);
-                var _time =
-                  time_year +
-                  "-" +
-                  time_month +
-                  "-" +
-                  time_day +
-                  " " +
-                  time_hour +
-                  ":" +
-                  time_minute +
-                  ":" +
-                  time_second;
-                tableRow.append("<td align='center'>" + _time + "</td>");
+                  var tableRow = $("<tr></tr>");
+                  var time_year = time.substring(0, 4);
+                  var time_month = time.substring(4, 6);
+                  var time_day = time.substring(6, 8);
+                  var time_hour = time.substring(9, 11);
+                  var time_minute = time.substring(11, 13);
+                  var time_second = time.substring(13, 15);
+                  var _time =
+                    time_year +
+                    "-" +
+                    time_month +
+                    "-" +
+                    time_day +
+                    " " +
+                    time_hour +
+                    ":" +
+                    time_minute +
+                    ":" +
+                    time_second;
+                  tableRow.append("<td align='center'>" + _time + "</td>");
 
-                // var output = "";
-                // output += "Time : " + time;
-                // output += " / Cheating : ";
-                $.each(cheatingList, function (index, value) {
-                  cheatings += " " + value;
-                });
+                  // var output = "";
+                  // output += "Time : " + time;
+                  // output += " / Cheating : ";
+                  $.each(cheatingList, function (index, value) {
+                    cheatings += " " + value;
+                  });
 
-                tableRow.append("<td align='center'>" + cheatings + "</td>");
+                  tableRow.append("<td align='center'>" + cheatings + "</td>");
 
-                var imgRoute =
-                  '<a href="http://127.0.0.1:8080/history/' +
-                  imgName +
-                  '">' +
-                  "확인하기" +
-                  "</a>";
+                  var imgRoute =
+                    '<a href="http://127.0.0.1:8080/history/' +
+                    imgName +
+                    '">' +
+                    "확인하기" +
+                    "</a>";
 
-                tableRow.append("<td align='center'>" + imgRoute + "</td>");
-                cheatingHistoryTable.append(tableRow);
+                  tableRow.append("<td align='center'>" + imgRoute + "</td>");
+                  cheatingHistoryTable.append(tableRow);
 
-                // cheatingHistoryDiv.append(output + "<br>");
+                  // cheatingHistoryDiv.append(output + "<br>");
+                }
               });
             });
           },
