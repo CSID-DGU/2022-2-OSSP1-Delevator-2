@@ -1,9 +1,18 @@
+<!DOCTYPE html>
 <html>
   <head>
     <title>Video Streaming Demonstration</title>
     <!-- JQuery fetching -->
     <script src="http://code.jquery.com/jquery-1.11.2.min.js"></script>
     <script src="http://code.jquery.com/jquery-migrate-1.2.1.min.js"></script>
+    <style>
+      table,
+      td,
+      th {
+        border: 1px solid black;
+        border-collapse: collapse;
+      }
+    </style>
     <script type="text/javascript" language="javascript">
       setInterval(() => {
         fetchCheatingHistory();
@@ -18,29 +27,48 @@
             // update the cheating history of div
 
             $.each(data, function (index, value) {
-              var cheatingHistoryDiv = $("#cheatingHistory");
-              cheatingHistoryDiv.empty();
+              // var cheatingHistoryDiv = $("#cheatingHistory");
+              // cheatingHistoryDiv.empty();
+              var cheatingHistoryTable = $("#historyTable");
+              cheatingHistoryTable.empty();
+
+              var tableHeader = $("<tr></tr>");
+              tableHeader.append("<th>적발 시각</th>");
+              tableHeader.append("<th>적발 목록</th>");
+              tableHeader.append("<th>화면 캡처본 확인</th>");
+              cheatingHistoryTable.append(tableHeader);
+
               console.log(value);
               $.each(value, function (index, value) {
-                cheatings = value["cheating_list"];
+                cheatingList = value["cheating_list"];
                 time = value["time"];
                 imgName = value["imgName"];
 
-                var output = "";
-                output += "Time : " + time;
-                output += " / Cheating : ";
-                $.each(cheatings, function (index, value) {
-                  output += value;
+                var cheatings = "";
+
+                var tableRow = $("<tr></tr>");
+                tableRow.append("<td>" + time + "</td>");
+
+                // var output = "";
+                // output += "Time : " + time;
+                // output += " / Cheating : ";
+                $.each(cheatingList, function (index, value) {
+                  cheatings += value;
                 });
 
-                output +=
-                  ' / ImageFileName : <a href="http://127.0.0.1:8080/history/' +
+                tableRow.append("<td>" + cheatings + "</td>");
+
+                var imgRoute =
+                  '<a href="http://127.0.0.1:8080/history/' +
                   imgName +
                   '">' +
                   imgName +
                   "</a>";
 
-                cheatingHistoryDiv.append(output + "<br>");
+                tableRow.append("<td>" + imgRoute + "</td>");
+                cheatingHistoryTable.append(tableRow);
+
+                // cheatingHistoryDiv.append(output + "<br>");
               });
             });
           },
@@ -53,7 +81,14 @@
   </head>
   <body>
     <h1>Video Streaming Demonstration</h1>
-    <img src="{{ url_for('video_feed') }}" />
+    <img src="{{ url_for('video_feed') }}" width="1066" height="600" />
+    <table id="historyTable">
+      <tr>
+        <td>���� �ð�</td>
+        <td>���� ����</td>
+        <td>�̹��� ���ϸ�</td>
+      </tr>
+    </table>
     <div id="cheatingHistory"><p></p></div>
   </body>
 </html>
