@@ -27,6 +27,12 @@ def index() -> '302':
     # return render_template('index.html', encoding='utf-8')
     return redirect('user/no_name')
 
+@app.route('/user/')
+def userRedirect() -> '302':
+    """Video streaming home page."""
+    # return render_template('index.html', encoding='utf-8')
+    return redirect('user/no_name')
+
 @app.route('/user/<username>')
 def index2(username):
     data = { "username" : username }
