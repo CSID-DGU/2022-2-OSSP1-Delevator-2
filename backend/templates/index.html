@@ -3,16 +3,47 @@
 <html>
   <head>
     <meta charset="utf-8" />
-    <title>Video Streaming Demonstration</title>
+    <title>Streaming for exam</title>
     <!-- JQuery fetching -->
     <script src="http://code.jquery.com/jquery-1.11.2.min.js"></script>
     <script src="http://code.jquery.com/jquery-migrate-1.2.1.min.js"></script>
     <style>
       table,
-      td,
+      td {
+        text-align: center;
+      }
       th {
         border: 1px solid black;
         border-collapse: collapse;
+      }
+      html, body {
+        margin: auto;
+        padding: auto;
+        height: 100%;
+      }
+      head {
+        margin: 0;
+        padding: 0;
+      }
+      .fullScreen {
+        background-color: #FEFCF3;
+        height: 100%;
+      }
+      .titleName {
+        /* margin-top: 100px; */
+        /* margin: 30px; */
+        text-align: center;
+      }
+      .streamingVideo{
+        border-radius: 25px;
+        margin: auto;
+        display: block;
+      }
+      .tableList {
+        /* margin: auto; */
+        display: flex;
+        margin: 10px;
+        justify-content: center;
       }
     </style>
     <script type="text/javascript" language="javascript">
@@ -105,13 +136,18 @@
     </script>
   </head>
   <body>
-    <h1>Video Streaming Demonstration</h1>
-    <img
-      src="{{ url_for('video_feed', username=username) }}"
-      width="1066"
-      height="600"
-    />
-    <table id="historyTable"></table>
-    <div id="cheatingHistory"><p></p></div>
+    <div class="fullScreen">
+      <h1 class="titleName">Streaming for exam</h1>
+      <img
+        class="streamingVideo"
+        src="{{ url_for('video_feed', username=username) }}"
+        width="1066"
+        height="600"
+      />
+      <div class="tableList">
+        <table id="historyTable"></table>
+        <div id="cheatingHistory"><p></p></div>
+      </div>
+    </div>
   </body>
 </html>
