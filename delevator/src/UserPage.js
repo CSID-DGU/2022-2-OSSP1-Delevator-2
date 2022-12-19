@@ -1,4 +1,4 @@
-import "./UserPage.css";
+// import "./UserPage.css";
 
 const UserPage = () => {
   return (
