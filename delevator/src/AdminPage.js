@@ -1,4 +1,4 @@
-import "./AdminPage.css";
+// import "./AdminPage.css";
 
 const AdminPage = () => {
   return (

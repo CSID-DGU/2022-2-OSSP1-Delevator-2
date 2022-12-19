@@ -8,19 +8,21 @@ import Admin from "./AdminPage";
 
 function App() {
   return (
-    <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<Login />} />
-        <Route
-          path="/user"
-          Component={() => {
-            window.location.href = "https://localhost:8080";
-            return null;
-          }}
-        />
-        <Route path="/admin" element={<Admin />} />
-      </Routes>
-    </BrowserRouter>
+    <div className="bg-[#FEFCF3] h-screen">
+      <BrowserRouter>
+        <Routes>
+          <Route path="/" element={<Login />} />
+          <Route
+            path="/user"
+            Component={() => {
+              window.location.href = "https://localhost:8080";
+              return null;
+            }}
+          />
+          <Route path="/admin" element={<Admin />} />
+        </Routes>
+      </BrowserRouter>
+    </div>
   );
 }
 
